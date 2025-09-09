@@ -1,1 +1,48 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: "DM-Sans";
+  src: url(/assets/fonts/DM_Sans/DMSans-VariableFont_opsz,wght.ttf);
+  font-style: 300 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bricolage";
+  src: url(/assets/fonts/Bricolage_Grotesque/BricolageGrotesque-VariableFont_opsz,wdth,wght.ttf);
+  font-style: 700;
+  font-display: swap;
+}
+
+@theme{
+  --font-DM-Sans: "DM-Sans", system-ui, sans-serif;
+  --font-Bricolage: "Bricolage", system-ui, sans-serif;
+  /*---Colors---*/
+  /*Neutral*/
+  --color-neutral-900: hsl(243, 96%, 9%);
+  --color-neutral-800: hsl(243, 27%, 20%);
+  --color-neutral-700: hsl(243, 23%, 24%);
+  --color-neutral-600: hsl(243, 23%, 30%);
+  --color-neutral-300: hsl(240, 6%, 70%);
+  --color-neutral-200: hsl(250, 6%, 84%);
+  --color-neutral-0: hsl(0, 0%, 100%);
+
+  /* Orange */
+  --color-orange-500: hsl(28, 100%, 52%);
+
+  /* Blue */
+  --color-blue-500: hsl(233, 67%, 56%);
+  --color-blue-700: hsl(248, 70%, 36%);
+}
+
+*{
+  @apply box-border;
+}
+
+html, body, main{
+  @apply min-h-screen;
+}
+
+body{
+  @apply font-DM-Sans bg-neutral-900
+}
