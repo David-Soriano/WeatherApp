@@ -21,20 +21,6 @@ export default function useWeeklyForecast({
 
     async function load() {
       if (cancelled) return;
-
-      const cacheKey = `${latitude}-${longitude}-${stableDate
-        .toISOString()
-        .slice(0, 10)}`;
-      const cached = sessionStorage.getItem(cacheKey);
-
-      if (cached) {
-        console.log("Usando cache", cacheKey);
-        setData(JSON.parse(cached));
-        setLoading(false);
-        return;
-      }
-
-      console.log("Haciendo fetch...");
       setLoading(true);
       setError(null);
 
@@ -49,15 +35,13 @@ export default function useWeeklyForecast({
           start_date: start,
           end_date: end,
           signal: controller.signal,
+          
         });
 
-        console.log("Respuesta transformada:", days);
         if (!cancelled) {
           setData(days);
-          sessionStorage.setItem(cacheKey, JSON.stringify(days));
         }
       } catch (err) {
-        console.error("Error en fetch:", err);
         if (!cancelled && err.name !== "AbortError") {
           setError(err);
         }
