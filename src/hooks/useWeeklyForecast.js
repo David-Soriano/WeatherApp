@@ -6,16 +6,16 @@ export default function useWeeklyForecast({
   latitude,
   longitude,
   date,
-  refreshIntervalMs = 60 * 60 * 1000 // 1h en ms
+  refreshIntervalMs = 60 * 60 * 1000 
 }) {
-  const [data, setData] = useState(null); // null = aún no cargado
+  const [data, setData] = useState(null); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 👉 evita que `new Date()` cambie en cada render
+  // evita que `new Date()` cambie en cada render
   const stableDate = useMemo(() => date ?? new Date(), [date]);
 
-  useEffect(() => {
+  useEffect(() => {  
     let cancelled = false;
     const controller = new AbortController();
 

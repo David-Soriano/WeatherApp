@@ -1,3 +1,4 @@
+import js from "@eslint/js";
 import { OPEN_METEO_BASE, DEFAULT_TIMEZONE } from "../config/wheatherConfig";
 
 function construirPronostico({
@@ -7,12 +8,19 @@ function construirPronostico({
     end_date,
     daily = null,
     hourly = null,
+    current = null,
     timezone = DEFAULT_TIMEZONE,
+    temperature_unit = "celsius",
+    windspeed_unit = "kmh",
+    precipitation_unit = "mm",
 }) {
     const params = new URLSearchParams({
         latitude: String(latitude),
         longitude: String(longitude),
         timezone,
+        temperature_unit,    // 👈 van por separado
+        windspeed_unit,
+        precipitation_unit,
     });
 
     if (daily) {
@@ -23,11 +31,16 @@ function construirPronostico({
         params.set("hourly", hourly.join(","));
     }
 
+    if (current) {
+        params.set("current", current.join(","));
+    }
+
     if (start_date) params.set("start_date", start_date);
     if (end_date) params.set("end_date", end_date);
 
     return `${OPEN_METEO_BASE}?${params.toString()}`;
 }
+
 
 
 function transformarDailyToArray(daily) {
@@ -90,4 +103,52 @@ export async function fetchHourlyForecast({ latitude, longitude, signal }) {
     const json = await res.json();
     const hours = transformarHourlyToArray(json.hourly);
     return hours;
+}
+
+export async function fetchLocationName({ latitude, longitude }) {
+    const url = `http://localhost/weatherBack/Proxy/proxy.php?lat=${latitude}&lon=${longitude}`;
+    const res = await fetch(url);
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Geocoding error: ${res.status} ${text}`);
+    }
+
+    const json = await res.json();
+
+
+    return {
+        city: json.address.municipality || json.address.city || json.address.town || "",
+        country: json.address.country || "",
+    }
+
+}
+
+export async function fetchCurrentWeather({ latitude, longitude, signal }) {
+    const url = construirPronostico({
+        latitude,
+        longitude,
+        current: ["temperature_2m", "weathercode", "apparent_temperature", "relative_humidity_2m", "wind_speed_10m", "precipitation"],
+        temperature_unit: "celsius",
+        windspeed_unit: "mph",
+        precipitation_unit: "inch",
+    });
+    
+    const res = await fetch(url, { signal });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Weather error: ${res.status} ${text}`);
+    }
+
+    const json = await res.json();
+
+    return {
+        temperature: json.current?.temperature_2m ?? null,
+        code: json.current?.weathercode ?? null,
+        sensation: json.current?.apparent_temperature ?? null,
+        humidity: json.current?.relative_humidity_2m ?? null,
+        wind: json.current?.wind_speed_10m ?? null,
+        precipitation: json.current?.precipitation ?? null
+    };
 }
