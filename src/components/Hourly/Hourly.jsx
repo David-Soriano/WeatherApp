@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function Hourly({ children }) {
+export function Hourly({ children, loading }) {
     const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
     const [open, setOpen] = useState(false);
     const [selected, setSelected] = useState(today);
@@ -14,7 +14,7 @@ export function Hourly({ children }) {
     "Sunday"
   ];
     return (
-        <section className="flex flex-col gap-4 rounded-lg bg-neutral-800 p-3 text-neutral-0 mt-6">
+        <section className="flex flex-col gap-4 rounded-lg bg-neutral-800 p-3 text-neutral-0 mt-6 h-[-webkit-fill-available]">
             <div className="flex justify-between items-center">
                 <h3 className=" font-medium">Hourly forecast</h3>
                 <div className="relative inline-block text-left">
@@ -23,7 +23,7 @@ export function Hourly({ children }) {
                         onClick={() => setOpen(!open)}
                         className="flex items-center gap-2 bg-neutral-600 px-3 py-1 rounded-lg cursor-pointer"
                     >
-                        <span className="text-neutral-0">{selected}</span>
+                        <span className="text-neutral-0">{!loading ? selected : "_"}</span>
                         <img
                             src="./assets/images/icon-dropdown.svg"
                             alt="dropdown"

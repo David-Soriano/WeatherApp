@@ -13,15 +13,15 @@ export function Header() {
             <div className="relative">
                 <button
                     onClick={() => setOpen(!open)}
-                    className="flex items-center gap-2 bg-neutral-800 text-neutral-0 p-2 rounded-lg"
+                    className="flex items-center gap-2 bg-neutral-800 text-neutral-0 p-2 rounded-lg cursor-pointer"
                 >
                     <img src="./assets/images/icon-units.svg" alt="Settings" />
                     <span>Units</span>
-                    <img src="./assets/images/icon-dropdown.svg" alt="Dropdown" />
+                    <img src="./assets/images/icon-dropdown.svg" alt="Dropdown"  className={`transition-transform ${open ? "rotate-180" : ""}`}/>
                 </button>
 
                 {open && (
-                    <div className="absolute mt-2 p-1 bg-neutral-800 border border-neutral-600 text-white rounded-lg shadow-lg w-48 right-0">
+                    <div className="absolute mt-2 p-1 bg-neutral-800 border border-neutral-600 text-white rounded-lg shadow-lg w-48 right-0 z-50">
                         <button className="w-full text-left p-2 rounded-lg cursor-pointer hover:bg-neutral-700">Switch to Imperial</button>
                         <section className="border-b border-neutral-600 mb-2">
                             <p className="text-neutral-300 text-sm p-2">Temperature</p>

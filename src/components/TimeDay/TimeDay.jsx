@@ -64,7 +64,7 @@ export function TimeDay({ hour, error }) {
         );
     }
     return (
-        <article className="bg-neutral-700 border border-neutral-600 flex px-3 py-1 rounded-lg min-h-5">
+        <article className="bg-neutral-700 border border-neutral-600 flex justify-between px-3 rounded-lg min-h-5">
             <section className="flex gap-2">
                 <div className='w-1/5'>
                     <img src={weatherCodeToEmoji(hour.code)} alt="Icon_Climate" className='w-full' />
