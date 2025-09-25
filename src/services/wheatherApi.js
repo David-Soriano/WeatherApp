@@ -77,9 +77,9 @@ function transformarHourlyToArray(hourly) {
         }
     });
 }
-export async function fetchWeeklyForecast({ latitude, longitude, start_date, end_date, signal, system = 'metric' }) {
-    const units = UNITS[system];
-    const url = construirPronostico({ latitude, longitude, start_date, end_date, daily: ["temperature_2m_min", "temperature_2m_max", "weathercode"], temperature_unit: units.temperature_unit });
+export async function fetchWeeklyForecast({ latitude, longitude, start_date, end_date, signal, units }) {
+    
+    const url = construirPronostico({ latitude, longitude, start_date, end_date, daily: ["temperature_2m_min", "temperature_2m_max", "weathercode"], temperature_unit: units.temp });
 
     const res = await fetch(url, { signal });
     if (!res.ok) {
@@ -88,25 +88,31 @@ export async function fetchWeeklyForecast({ latitude, longitude, start_date, end
     }
 
     const json = await res.json();
-  
+
     const days = transformarDailyToArray(json.daily);
     return days;
 }
 
-export async function fetchHourlyForecast({ latitude, longitude, signal, system = 'metric' }) {
-    const unit = UNITS[system]
-    const url = construirPronostico({ latitude, longitude, hourly: ["temperature_2m", "weathercode"], temperature_unit: unit.temperature_unit });
-    ("Temp. Por Dia", url);
-    const res = await fetch(url, { signal });
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Open-Meteo error: ${res.status} ${text}`);
-    }
+export async function fetchHourlyForecast({ latitude, longitude, signal, units }) {
 
-    const json = await res.json();
-    const hours = transformarHourlyToArray(json.hourly);
-    return hours;
+  const url = construirPronostico({
+    latitude,
+    longitude,
+    hourly: ["temperature_2m", "weathercode"],
+    temperature_unit: units.temp === "fahrenheit" ? "fahrenheit" : "celsius",
+  });
+
+  const res = await fetch(url, { signal });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Open-Meteo error: ${res.status} ${text}`);
+  }
+
+  const json = await res.json();
+
+  return transformarHourlyToArray(json.hourly);
 }
+
 
 export async function fetchLocationName({ latitude, longitude }) {
     const url = `http://localhost/weatherBack/Proxy/proxy.php?lat=${latitude}&lon=${longitude}`;
@@ -127,18 +133,16 @@ export async function fetchLocationName({ latitude, longitude }) {
 
 }
 
-export async function fetchCurrentWeather({ latitude, longitude, signal, system = 'metric' }) {
-    const units = UNITS[system];
+export async function fetchCurrentWeather({ latitude, longitude, signal, units }) {
 
     const url = construirPronostico({
         latitude,
         longitude,
         current: ["temperature_2m", "weathercode", "apparent_temperature", "relative_humidity_2m", "wind_speed_10m", "precipitation"],
-        temperature_unit: units.temperature_unit,
-        windspeed_unit: units.windspeed_unit,
-        precipitation_unit: units.precipitation_unit,
+        temperature_unit: units.temp,
+        windspeed_unit: units.wind,
+        precipitation_unit: units.precip,
     });
-
     const res = await fetch(url, { signal });
 
     if (!res.ok) {
@@ -147,7 +151,6 @@ export async function fetchCurrentWeather({ latitude, longitude, signal, system 
     }
 
     const json = await res.json();
-
     return {
         temperature: json.current?.temperature_2m ?? null,
         code: json.current?.weathercode ?? null,

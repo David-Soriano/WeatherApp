@@ -6,7 +6,7 @@ export function Header({ system, setSystem, unitConfig, setUnit}) {
   // Componente de botón de opción
   const OptionButton = ({ label, value, selected, onSelect, className }) => (
     <button
-      onClick={() => onSelect(value)}
+      onClick={() => (value ? onSelect(value) : onSelect())}
       className={`w-full flex justify-between items-center text-left p-2 rounded-lg cursor-pointer hover:bg-neutral-700 ${className} ${
         selected === value ? "bg-neutral-700" : ""
       }`}
@@ -64,13 +64,13 @@ export function Header({ system, setSystem, unitConfig, setUnit}) {
               <p className="text-neutral-300 text-sm p-2">Temperature</p>
               <OptionButton
                 label="Celsius (°C)"
-                value="C"
+                value="celsius"
                 selected={unitConfig[system].temp}
                 onSelect={(val) => setUnit(system, "temp", val)}
               />
               <OptionButton
                 label="Fahrenheit (°F)"
-                value="F"
+                value="fahrenheit"
                 selected={unitConfig[system].temp}
                 onSelect={(val) => setUnit(system, "temp", val)}
               />
@@ -80,7 +80,7 @@ export function Header({ system, setSystem, unitConfig, setUnit}) {
               <p className="text-neutral-300 text-sm p-2">Wind Speed</p>
               <OptionButton
                 label="km/h"
-                value="km"
+                value="kmh"
                 selected={unitConfig[system].wind}
                 onSelect={(val) => setUnit(system, "wind", val)}
               />
@@ -102,7 +102,7 @@ export function Header({ system, setSystem, unitConfig, setUnit}) {
               />
               <OptionButton
                 label="Inches (in)"
-                value="in"
+                value="inch"
                 selected={unitConfig[system].precip}
                 onSelect={(val) => setUnit(system, "precip", val)}
               />

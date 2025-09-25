@@ -13,7 +13,16 @@ export function DetailsClimate({ coords, loading, error, data, units }) {
         day: "numeric",
         year: "numeric"
     }).format(date);
-
+    const unitLabels = {
+        kmh: "km/h",
+        mph: "mph",
+        ms: "m/s",
+        kn: "knots",
+        mm: "mm",
+        inch: "in",
+        celsius: "°C",
+        fahrenheit: "°F",
+    };
     return (
         <section className="flex flex-col gap-4 flex-1">
             {!coords && (
@@ -68,8 +77,8 @@ export function DetailsClimate({ coords, loading, error, data, units }) {
             <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <CardDetailClimate title={"Feels like"} value={sensation} unid={"°"} loading={loading} />
                 <CardDetailClimate title={"Humidity"} value={humidity} unid={"%"} loading={loading} />
-                <CardDetailClimate title={"Wind"} value={wind} unid={units.wind} loading={loading} />
-                <CardDetailClimate title={"Precipitation"} value={precipitation} unid={units.precip} loading={loading} />
+                <CardDetailClimate title={"Wind"} value={wind} unid={unitLabels[units.wind]} loading={loading} />
+                <CardDetailClimate title={"Precipitation"} value={precipitation} unid={unitLabels[units.precip]} loading={loading} />
             </section>
         </section>
     );

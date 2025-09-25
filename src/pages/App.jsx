@@ -21,14 +21,13 @@ function App() {
   const [coords, setCoords] = useState(DEFAULT_COORDS);
   // Estado global: "metric" | "imperial"
   const [system, setSystem] = useState("metric");
-  const [tempUnit, setTempUnit] = useState("C");
-  const [windUnit, setWindUnit] = useState("km");
-  const [precipUnit, setPrecipUnit] = useState("mm");
 
-  const [unitConfig, setUnitConfig] = useState({
-    metric: { temp: "C", wind: "km", precip: "mm" },
-    imperial: { temp: "F", wind: "mph", precip: "in" }
-  });
+  const defaultUnits = {
+    metric: { temp: "celsius", wind: "kmh", precip: "mm" },
+    imperial: { temp: "fahrenheit", wind: "mph", precip: "inch" }
+  };
+
+  const [unitConfig, setUnitConfig] = useState(defaultUnits);
 
   // Función para actualizar
   const setUnit = (system, type, value) => {
@@ -41,6 +40,17 @@ function App() {
     }));
   };
 
+  const toggleSystem = () => {
+    setSystem((prev) => {
+      const next = prev === "metric" ? "imperial" : "metric";
+      setUnitConfig((prev) => ({
+        ...prev,
+        [next]: defaultUnits[next] // vuelve al default de ese sistema
+      }));
+      return next;
+    });
+  };
+
   const units = unitConfig[system];
 
   useEffect(() => {
@@ -49,9 +59,9 @@ function App() {
     }
   }, [ubi]);
 
-  const { data, loading, error } = useWeeklyForecast({ ...coords, system });
-  const { dataHr: hourly, loadingHr, errorHr } = useHourlyForecast({ ...coords, system });
-  const { dataLoc, loadingLoc, errorLoc } = useWeatherWithLocation({ ...coords, system });
+  const { data, loading, error } = useWeeklyForecast({ ...coords, units });
+  const { dataHr: hourly, loadingHr, errorHr } = useHourlyForecast({ ...coords, units });
+  const { dataLoc, loadingLoc, errorLoc } = useWeatherWithLocation({ ...coords, units });
 
   const daysToRender = (loading || loadingLoc)
     ? Array(7).fill(null)
@@ -63,7 +73,7 @@ function App() {
 
   return (
     <>
-      <Header system={system} setSystem={setSystem} unitConfig={unitConfig} setUnit={setUnit}/>
+      <Header system={system} setSystem={toggleSystem} unitConfig={unitConfig} setUnit={setUnit} />
       <Main>
         {errorLoc && (
           <Error />

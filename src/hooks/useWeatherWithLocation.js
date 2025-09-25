@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchLocationName } from "../services/wheatherApi";
 import { fetchCurrentWeather } from "../services/wheatherApi";
 
-export default function useWeatherWithLocation({ latitude, longitude, system }) {
+export default function useWeatherWithLocation({ latitude, longitude, units }) {
     const [dataLoc, setData] = useState(null);
     const [loadingLoc, setLoading] = useState(false);
     const [errorLoc, setError] = useState(null);
@@ -15,7 +15,7 @@ export default function useWeatherWithLocation({ latitude, longitude, system }) 
 
             try {
                 const [weather, location] = await Promise.all([
-                    fetchCurrentWeather({ latitude, longitude, system }),
+                    fetchCurrentWeather({ latitude, longitude, units }),
                     fetchLocationName({ latitude, longitude })
                 ]);
                 
@@ -37,6 +37,6 @@ export default function useWeatherWithLocation({ latitude, longitude, system }) 
         }
 
         load();
-    }, [latitude, longitude, system]);
+    }, [latitude, longitude, units]);
     return { dataLoc, loadingLoc, errorLoc }
 }

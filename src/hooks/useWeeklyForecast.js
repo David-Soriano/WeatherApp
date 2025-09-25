@@ -7,7 +7,7 @@ export default function useWeeklyForecast({
   longitude,
   date,
   refreshIntervalMs = 60 * 60 * 1000,
-  system
+  units
 }) {
   const [data, setData] = useState(null); 
   const [loading, setLoading] = useState(false);
@@ -35,7 +35,7 @@ export default function useWeeklyForecast({
           start_date: start,
           end_date: end,
           signal: controller.signal,
-          system
+          units
         });
 
         if (!cancelled) {
@@ -65,7 +65,7 @@ export default function useWeeklyForecast({
       controller.abort();
       if (intervalId) clearInterval(intervalId);
     };
-  }, [latitude, longitude, stableDate, refreshIntervalMs, system]);
+  }, [latitude, longitude, stableDate, refreshIntervalMs, units]);
 
   return { data, loading, error };
 }
