@@ -54,29 +54,27 @@ function transformarDailyToArray(daily) {
 }
 
 function transformarHourlyToArray(hourly) {
-    if (!hourly || !hourly.time) return [];
+  if (!hourly || !hourly.time) return [];
 
-    const now = new Date();
-
-    const startIndex = hourly.time.findIndex((t) => new Date(t) > + now);
-
-    const index = startIndex === -1 ? 0 : startIndex;
-
-
-    return hourly.time.slice(index, index + 8).map((time, i) => {
-        const date = new Date(time);
-        const formattedHour = date.toLocaleTimeString("en-US", {
-            hour: "numeric",
-            hour12: true,
-        });
-
-        return {
-            time: formattedHour,
-            temp: hourly.temperature_2m?.[index + i] ?? null,
-            code: hourly.weathercode?.[index + 1] ?? null,
-        }
+  return hourly.time.map((time, i) => {
+    const date = new Date(time);
+    const formattedHour = date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      hour12: true,
     });
+    const day = date.toLocaleDateString("en-US", { weekday: "long" });
+
+    return {
+      day,   // 👈 guardamos el día
+      time: formattedHour,
+      temp: hourly.temperature_2m?.[i] ?? null,
+      code: hourly.weathercode?.[i] ?? null,
+    };
+  });
 }
+
+
+
 export async function fetchWeeklyForecast({ latitude, longitude, start_date, end_date, signal, units }) {
     
     const url = construirPronostico({ latitude, longitude, start_date, end_date, daily: ["temperature_2m_min", "temperature_2m_max", "weathercode"], temperature_unit: units.temp });

@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-export function Hourly({ children, loading }) {
-    const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
+export function Hourly({ children, loading, selected, setSelected }) {
+    
     const [open, setOpen] = useState(false);
-    const [selected, setSelected] = useState(today);
+    
     const days = [
         "Monday",
         "Tuesday",

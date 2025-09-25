@@ -6,7 +6,7 @@ import { DetailsForecast } from "../components/DetailsForecast/DetailsForecast.j
 import Footer from "../components/Footer/Footer.jsx";
 
 import useWeeklyForecast from "../hooks/useWeeklyForecast.js"
-import useHourlyForecast from "../hooks/useHourlyForecast.js";
+import { useHourlyForecast, getHoursForDay } from "../hooks/useHourlyForecast.js";
 import useWeatherWithLocation from "../hooks/useWeatherWithLocation.js";
 import useCurrentLocation from "../hooks/useCurrentLocation.js";
 
@@ -15,12 +15,14 @@ import DayCard from '../components/DayCard/DayCard.jsx'
 import { Hourly } from "../components/Hourly/Hourly.jsx";
 import { TimeDay } from "../components/TimeDay/TimeDay.jsx";
 import Error from "../components/Error/Error.jsx";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 function App() {
   let ubi = useCurrentLocation();
-  const [coords, setCoords] = useState(DEFAULT_COORDS);
-  // Estado global: "metric" | "imperial"
+  const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
+  const [coords, setCoords] = useState(null);
+
   const [system, setSystem] = useState("metric");
+  const [selected, setSelected] = useState(today);
 
   const defaultUnits = {
     metric: { temp: "celsius", wind: "kmh", precip: "mm" },
@@ -56,6 +58,9 @@ function App() {
   useEffect(() => {
     if (ubi) {
       setCoords(ubi);
+    } else if (!ubi && !coords) {
+      // si no hay coords todavía, fallback
+      setCoords(DEFAULT_COORDS);
     }
   }, [ubi]);
 
@@ -63,13 +68,46 @@ function App() {
   const { dataHr: hourly, loadingHr, errorHr } = useHourlyForecast({ ...coords, units });
   const { dataLoc, loadingLoc, errorLoc } = useWeatherWithLocation({ ...coords, units });
 
+  function parseHour(timeStr) {
+    const match = timeStr.match(/(\d+)\s?(AM|PM)?/i);
+    if (!match) return 0;
+    let hour = parseInt(match[1], 10);
+    const meridian = match[2];
+
+    if (meridian) {
+      if (meridian.toUpperCase() === "PM" && hour !== 12) hour += 12;
+      if (meridian.toUpperCase() === "AM" && hour === 12) hour = 0;
+    }
+    return hour;
+  }
+
+  const hours = useMemo(() => {
+    if (!hourly) return [];
+
+    const filtered = hourly.filter((h) => h.day === selected);
+    if (filtered.length === 0) return [];
+
+    if (selected === today) {
+      const now = new Date();
+      const currentHour = now.getHours();
+
+      const startIndex = filtered.findIndex((h) => parseHour(h.time) >= currentHour);
+      const index = startIndex === -1 ? 0 : startIndex;
+
+      return filtered.slice(index, index + 8);
+    }
+
+    return filtered.slice(5, 13);
+  }, [hourly, selected]);
+
+  console.log(hours)
   const daysToRender = (loading || loadingLoc)
     ? Array(7).fill(null)
     : data;
 
   const hoursToRender = (loadingHr || loadingLoc)
     ? Array(8).fill(null)
-    : hourly;
+    : hours;
 
   return (
     <>
@@ -91,7 +129,7 @@ function App() {
                 </DetailsForecast>
               </section>
               <section>
-                <Hourly loading={loadingLoc}>
+                <Hourly loading={loadingLoc} selected={selected} setSelected={setSelected}>
                   {hoursToRender && hoursToRender.map((hour, i) => (
                     <TimeDay key={i} hour={hour} error={errorHr} />
                   ))}

@@ -1,18 +1,21 @@
 import { CardDetailClimate } from "../CardDetailClimate/CardDetailClimate";
 import useWeatherCodeToEmoji from "../../hooks/useWeatherCode";
 export function DetailsClimate({ coords, loading, error, data, units }) {
+    
     const date = new Date();
     const temperature = Math.round(data?.temperature ?? 0);
     const sensation = Math.round(data?.sensation ?? 0);
     const humidity = Math.round(data?.humidity ?? 0);
     const wind = Math.round(data?.wind ?? 0);
     const precipitation = Math.round(data?.precipitation ?? 0);
+
     const formattedDate = new Intl.DateTimeFormat("en-US", {
         weekday: "long",
         month: "short",
         day: "numeric",
         year: "numeric"
     }).format(date);
+
     const unitLabels = {
         kmh: "km/h",
         mph: "mph",
@@ -23,6 +26,7 @@ export function DetailsClimate({ coords, loading, error, data, units }) {
         celsius: "°C",
         fahrenheit: "°F",
     };
+
     return (
         <section className="flex flex-col gap-4 flex-1">
             {!coords && (

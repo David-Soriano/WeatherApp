@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { fetchHourlyForecast } from "../services/wheatherApi";
 
-export default function useHourlyForecast({ latitude, longitude, units}) {
+export function useHourlyForecast({ latitude, longitude, units}) {
 
     const [dataHr, setData] = useState(null);
     const [loadingHr, setLoading] = useState(false);
@@ -40,4 +40,12 @@ export default function useHourlyForecast({ latitude, longitude, units}) {
     }, [latitude, longitude, units]);
 
     return { dataHr, loadingHr, errorHr };
+}
+
+export function getHoursForDay(dataHr, selectedDay, startHour = 0, range = 8) {
+  if (!dataHr) return [];
+
+  const hours = dataHr.filter((h) => h.day === selectedDay);
+
+  return hours.slice(startHour, startHour + range);
 }
