@@ -6,12 +6,12 @@ export default function useWeeklyForecast({
   latitude,
   longitude,
   date,
-  refreshIntervalMs = 60 * 60 * 1000 
+  refreshIntervalMs = 60 * 60 * 1000,
+  system
 }) {
   const [data, setData] = useState(null); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
   // evita que `new Date()` cambie en cada render
   const stableDate = useMemo(() => date ?? new Date(), [date]);
 
@@ -35,7 +35,7 @@ export default function useWeeklyForecast({
           start_date: start,
           end_date: end,
           signal: controller.signal,
-          
+          system
         });
 
         if (!cancelled) {
@@ -65,7 +65,7 @@ export default function useWeeklyForecast({
       controller.abort();
       if (intervalId) clearInterval(intervalId);
     };
-  }, [latitude, longitude, stableDate, refreshIntervalMs]);
+  }, [latitude, longitude, stableDate, refreshIntervalMs, system]);
 
   return { data, loading, error };
 }

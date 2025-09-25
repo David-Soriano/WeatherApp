@@ -1,5 +1,5 @@
-import js from "@eslint/js";
-import { OPEN_METEO_BASE, DEFAULT_TIMEZONE } from "../config/wheatherConfig";
+
+import { OPEN_METEO_BASE, DEFAULT_TIMEZONE, UNITS } from "../config/wheatherConfig";
 
 function construirPronostico({
     latitude,
@@ -77,8 +77,9 @@ function transformarHourlyToArray(hourly) {
         }
     });
 }
-export async function fetchWeeklyForecast({ latitude, longitude, start_date, end_date, signal }) {
-    const url = construirPronostico({ latitude, longitude, start_date, end_date, daily: ["temperature_2m_min", "temperature_2m_max", "weathercode"], });
+export async function fetchWeeklyForecast({ latitude, longitude, start_date, end_date, signal, system = 'metric' }) {
+    const units = UNITS[system];
+    const url = construirPronostico({ latitude, longitude, start_date, end_date, daily: ["temperature_2m_min", "temperature_2m_max", "weathercode"], temperature_unit: units.temperature_unit });
 
     const res = await fetch(url, { signal });
     if (!res.ok) {
@@ -87,12 +88,14 @@ export async function fetchWeeklyForecast({ latitude, longitude, start_date, end
     }
 
     const json = await res.json();
+  
     const days = transformarDailyToArray(json.daily);
     return days;
 }
 
-export async function fetchHourlyForecast({ latitude, longitude, signal }) {
-    const url = construirPronostico({ latitude, longitude, hourly: ["temperature_2m", "weathercode"] });
+export async function fetchHourlyForecast({ latitude, longitude, signal, system = 'metric' }) {
+    const unit = UNITS[system]
+    const url = construirPronostico({ latitude, longitude, hourly: ["temperature_2m", "weathercode"], temperature_unit: unit.temperature_unit });
     ("Temp. Por Dia", url);
     const res = await fetch(url, { signal });
     if (!res.ok) {
@@ -124,16 +127,18 @@ export async function fetchLocationName({ latitude, longitude }) {
 
 }
 
-export async function fetchCurrentWeather({ latitude, longitude, signal }) {
+export async function fetchCurrentWeather({ latitude, longitude, signal, system = 'metric' }) {
+    const units = UNITS[system];
+
     const url = construirPronostico({
         latitude,
         longitude,
         current: ["temperature_2m", "weathercode", "apparent_temperature", "relative_humidity_2m", "wind_speed_10m", "precipitation"],
-        temperature_unit: "celsius",
-        windspeed_unit: "mph",
-        precipitation_unit: "inch",
+        temperature_unit: units.temperature_unit,
+        windspeed_unit: units.windspeed_unit,
+        precipitation_unit: units.precipitation_unit,
     });
-    
+
     const res = await fetch(url, { signal });
 
     if (!res.ok) {
@@ -151,4 +156,12 @@ export async function fetchCurrentWeather({ latitude, longitude, signal }) {
         wind: json.current?.wind_speed_10m ?? null,
         precipitation: json.current?.precipitation ?? null
     };
+}
+
+export async function fetchCity(query) {
+    const res = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=en&format=json`
+    );
+    if (!res.ok) throw new Error("Error buscando ciudad");
+    return res.json();
 }

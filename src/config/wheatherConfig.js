@@ -4,3 +4,16 @@ export const OPEN_METEO_BASE = 'https://api.open-meteo.com/v1/forecast';
 export const DEFAULT_TIMEZONE ='auto';
 //Exportamos las coordenadas de la ubicación que qeueremos monitorear
 export const DEFAULT_COORDS = { latitude: 4.7110, longitude: -74.0721 };
+
+export const UNITS = {
+  metric: {
+    temperature_unit: "celsius",
+    windspeed_unit: "kmh",
+    precipitation_unit: "mm",
+  },
+  imperial: {
+    temperature_unit: "fahrenheit",
+    windspeed_unit: "mph",
+    precipitation_unit: "inch",
+  },
+};

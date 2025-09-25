@@ -15,12 +15,43 @@ import DayCard from '../components/DayCard/DayCard.jsx'
 import { Hourly } from "../components/Hourly/Hourly.jsx";
 import { TimeDay } from "../components/TimeDay/TimeDay.jsx";
 import Error from "../components/Error/Error.jsx";
+import { useEffect, useState } from "react";
 function App() {
-  const coords = useCurrentLocation() || { latitude: DEFAULT_COORDS.latitude, longitude: DEFAULT_COORDS.longitude };
+  let ubi = useCurrentLocation();
+  const [coords, setCoords] = useState(DEFAULT_COORDS);
+  // Estado global: "metric" | "imperial"
+  const [system, setSystem] = useState("metric");
+  const [tempUnit, setTempUnit] = useState("C");
+  const [windUnit, setWindUnit] = useState("km");
+  const [precipUnit, setPrecipUnit] = useState("mm");
 
-  const { data, loading, error } = useWeeklyForecast(coords || { latitude: DEFAULT_COORDS.latitude, longitude: DEFAULT_COORDS.longitude });
-  const { dataHr: hourly, loadingHr, errorHr } = useHourlyForecast(coords || { latitude: DEFAULT_COORDS.latitude, longitude: DEFAULT_COORDS.longitude });
-  const { dataLoc, loadingLoc, errorLoc } = useWeatherWithLocation(coords || { latitude: DEFAULT_COORDS.latitude, longitude: DEFAULT_COORDS.longitude });
+  const [unitConfig, setUnitConfig] = useState({
+    metric: { temp: "C", wind: "km", precip: "mm" },
+    imperial: { temp: "F", wind: "mph", precip: "in" }
+  });
+
+  // Función para actualizar
+  const setUnit = (system, type, value) => {
+    setUnitConfig((prev) => ({
+      ...prev,
+      [system]: {
+        ...prev[system],
+        [type]: value
+      }
+    }));
+  };
+
+  const units = unitConfig[system];
+
+  useEffect(() => {
+    if (ubi) {
+      setCoords(ubi);
+    }
+  }, [ubi]);
+
+  const { data, loading, error } = useWeeklyForecast({ ...coords, system });
+  const { dataHr: hourly, loadingHr, errorHr } = useHourlyForecast({ ...coords, system });
+  const { dataLoc, loadingLoc, errorLoc } = useWeatherWithLocation({ ...coords, system });
 
   const daysToRender = (loading || loadingLoc)
     ? Array(7).fill(null)
@@ -32,17 +63,17 @@ function App() {
 
   return (
     <>
-      <Header />
+      <Header system={system} setSystem={setSystem} unitConfig={unitConfig} setUnit={setUnit}/>
       <Main>
         {errorLoc && (
           <Error />
         )}
         {!errorLoc && (
           <>
-            <Intro />
+            <Intro setCoords={setCoords} />
             <section className="lg:grid lg:grid-cols-[70%_30%] gap-4">
               <section className="flex flex-col">
-                <DetailsClimate coords={coords} data={dataLoc} loading={loadingLoc} error={errorLoc} />
+                <DetailsClimate coords={coords} data={dataLoc} loading={loadingLoc} error={errorLoc} units={units} />
                 <DetailsForecast>
                   {daysToRender && daysToRender.map((day, i) => (
                     <DayCard key={i} day={day} error={error} />
@@ -57,11 +88,12 @@ function App() {
                 </Hourly>
               </section>
             </section>
+            <Footer />
           </>
         )}
-        <Footer />
+
       </Main>
-      
+
     </>
   );
 }

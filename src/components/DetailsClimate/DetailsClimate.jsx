@@ -1,6 +1,6 @@
 import { CardDetailClimate } from "../CardDetailClimate/CardDetailClimate";
 import useWeatherCodeToEmoji from "../../hooks/useWeatherCode";
-export function DetailsClimate({ coords, loading, error, data }) {
+export function DetailsClimate({ coords, loading, error, data, units }) {
     const date = new Date();
     const temperature = Math.round(data?.temperature ?? 0);
     const sensation = Math.round(data?.sensation ?? 0);
@@ -22,7 +22,19 @@ export function DetailsClimate({ coords, loading, error, data }) {
                 </section>
             )}
             {loading && (
-                <section className="text-neutral-0 bg-neutral-800 w-full h-74 flex justify-center items-center mt-7 rounded-2xl">
+                <section className="text-neutral-0 bg-neutral-800 w-full h-74 flex flex-col justify-center items-center mt-7 rounded-2xl">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="60"
+                        height="20"
+                        viewBox="0 0 60 20"
+                        fill="currentColor"
+                        className="text-neutral-0 mb-2"
+                    >
+                        <circle cx="10" cy="10" r="6" className="animate-wave-delay-1" />
+                        <circle cx="30" cy="10" r="6" className="animate-wave-delay-2" />
+                        <circle cx="50" cy="10" r="6" className="animate-wave-delay-3" />
+                    </svg>
                     <p>Loading...</p>
                 </section>
             )}
@@ -56,8 +68,8 @@ export function DetailsClimate({ coords, loading, error, data }) {
             <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <CardDetailClimate title={"Feels like"} value={sensation} unid={"°"} loading={loading} />
                 <CardDetailClimate title={"Humidity"} value={humidity} unid={"%"} loading={loading} />
-                <CardDetailClimate title={"Wind"} value={wind} unid={" mph"} loading={loading} />
-                <CardDetailClimate title={"Precipitation"} value={precipitation} unid={" in"} loading={loading} />
+                <CardDetailClimate title={"Wind"} value={wind} unid={units.wind} loading={loading} />
+                <CardDetailClimate title={"Precipitation"} value={precipitation} unid={units.precip} loading={loading} />
             </section>
         </section>
     );
