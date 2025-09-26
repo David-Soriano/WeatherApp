@@ -113,7 +113,7 @@ export async function fetchHourlyForecast({ latitude, longitude, signal, units }
 
 
 export async function fetchLocationName({ latitude, longitude }) {
-    const url = `http://localhost/weatherBack/Proxy/proxy.php?lat=${latitude}&lon=${longitude}`;
+    const url = `http://localhost/Practica/CSS_HTML/REACT/Hackaton/WeatherApp/WeatherBack/Proxy/proxy.php?lat=${latitude}&lon=${longitude}`;
     const res = await fetch(url);
 
     if (!res.ok) {
